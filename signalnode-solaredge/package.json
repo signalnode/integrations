@@ -1,0 +1,11 @@
+{
+  "name": "signalnode-solaredge",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "author": "Dawosch",
+  "description": "A SolarEdge implementation for SignalNode",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
+}
