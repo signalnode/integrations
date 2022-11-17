@@ -1,16 +1,17 @@
+import { SignalNodeModule } from '@signalnode/types';
 import SolarEdgeClient from 'solaredge-client';
-import { SignalNodeModule, UIConfig } from '@signalnode/types';
-import { Job } from '@signalnode/types/dist/job';
 
 let solarEdgeClient: SolarEdgeClient;
 
 type Config = {
   apiKey: string;
-  siteId: number;
+  siteId: string;
 };
 
-const SolarEdgeAddon: SignalNodeModule = {
-  getUIConfig: (): UIConfig => ({
+type Entity = 'lifeTimeEnergy' | 'lastYearEnergy' | 'lastMonthEnergy' | 'lastDayEnergy' | 'currentPower';
+
+const SolarEdgeAddon: SignalNodeModule<Config, Entity> = {
+  getUIConfig: () => ({
     columnTemplate: 'auto auto',
     rowTemplate: 'auto auto',
     gap: 20,
@@ -37,40 +38,28 @@ const SolarEdgeAddon: SignalNodeModule = {
   }),
   getEntities: () => [
     {
-      name: 'totalEnergy',
-      description: 'Total generated energy',
+      name: 'currentPower',
+      description: 'Current power',
       value: 0,
-      unit: 'wh',
-      interval: ['*/10', '*', '*', '*', '*', '*'],
-      job: async (config: Config) => {
-        // const res = await solarEdgeClient.getOverview(config.siteId);
-        // return res.owerview.lifeTimeData;
-        return 'Test';
-      },
+      unit: 'w',
     },
     {
-      name: 'test',
-      description: 'test',
+      name: 'lastDayEnergy',
+      description: 'Last day energy',
       value: 0,
       unit: 'wh',
+    },
+  ],
+  registerJobs: () => [
+    {
       interval: ['*/10', '*', '*', '*', '*', '*'],
-      job: (config: Config) => {
-        // const res = await solarEdgeClient.getOverview(config.siteId);
-        // return res.owerview.lifeTimeData;
-        return 'Test';
+      job: async (config: Config) => {
+        const res = await solarEdgeClient.getOverview(config.siteId);
+        return [['currentPower', res.owerview.currentPower.power]];
       },
     },
   ],
-  // registerJobs: () => [
-  //   {
-  //     interval: 1000,
-  //     job: async () => {
-  //       const res = await solarEdgeClient.getEnergy({ siteId: 123, startDate: '123', endDate: '123', timeUnit: 'DAY' });
-  //       return ['test', res.energy.values[0].value];
-  //     },
-  //   },
-  // ],
-  run: (config: Config) => {
+  run: (config) => {
     console.log('Addon started');
 
     solarEdgeClient = new SolarEdgeClient(config.apiKey);
