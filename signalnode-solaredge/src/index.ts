@@ -11,7 +11,7 @@ type Config = {
 type Entity = 'lifeTimeEnergy' | 'lastYearEnergy' | 'lastMonthEnergy' | 'lastDayEnergy' | 'currentPower';
 
 const SolarEdgeAddon: SignalNodeModule<Config, Entity> = {
-  getUIConfig: () => ({
+  uiConfig: {
     columnTemplate: 'auto auto',
     rowTemplate: 'auto auto',
     gap: 20,
@@ -35,8 +35,8 @@ const SolarEdgeAddon: SignalNodeModule<Config, Entity> = {
         },
       },
     ],
-  }),
-  getEntities: () => [
+  },
+  entities: [
     {
       name: 'currentPower',
       description: 'Current power',
@@ -50,18 +50,21 @@ const SolarEdgeAddon: SignalNodeModule<Config, Entity> = {
       unit: 'wh',
     },
   ],
-  registerJobs: () => [
+  jobs: [
     {
-      interval: ['*/10', '*', '*', '*', '*', '*'],
-      job: async (config: Config) => {
+      interval: ['*/5', '*', '*', '*', '*'],
+      run: async (config: Config) => {
         const res = await solarEdgeClient.getOverview(config.siteId);
-        return [['currentPower', res.owerview.currentPower.power]];
+
+        return [
+          ['currentPower', res.overview.currentPower.power],
+          ['lastDayEnergy', res.overview.lastDayData.energy],
+        ];
       },
     },
   ],
-  run: (config) => {
-    console.log('Addon started');
-
+  run: async (config) => {
+    console.log('Config:', config);
     solarEdgeClient = new SolarEdgeClient(config.apiKey);
   },
 };
