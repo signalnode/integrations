@@ -1,14 +1,18 @@
 {
   "name": "signalnode-solaredge",
   "version": "0.1.0",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Dawosch",
   "description": "A SolarEdge implementation for SignalNode",
   "license": "MIT",
-  "devDependencies": {
-    "typescript": "^4.8.4"
+  "scripts": {
+    "build": "tsc -p ."
   },
   "dependencies": {
-    "solaredge-client": "^0.2.4"
+    "solaredge-client": "^0.3.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.4"
   }
 }

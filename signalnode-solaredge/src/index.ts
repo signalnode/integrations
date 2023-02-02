@@ -1,4 +1,4 @@
-import { SignalNodeModule } from '@signalnode/types';
+import { SignalNodeAddon } from '@signalnode/types';
 import SolarEdgeClient from 'solaredge-client';
 
 let solarEdgeClient: SolarEdgeClient;
@@ -8,10 +8,10 @@ type Config = {
   siteId: string;
 };
 
-type Entity = 'lifeTimeEnergy' | 'lastYearEnergy' | 'lastMonthEnergy' | 'lastDayEnergy' | 'currentPower';
+type PropertyNames = 'currentExport' | 'currentConsumption' | 'currentSelfConsumption' | 'currentImport';
 
-const SolarEdgeAddon: SignalNodeModule<Config, Entity> = {
-  uiConfig: {
+const SolarEdgeAddon: SignalNodeAddon<Config, PropertyNames> = {
+  configLayout: {
     columnTemplate: 'auto auto',
     rowTemplate: 'auto auto',
     gap: 20,
@@ -36,34 +36,68 @@ const SolarEdgeAddon: SignalNodeModule<Config, Entity> = {
       },
     ],
   },
-  entities: [
+  properties: [
     {
-      name: 'currentPower',
-      description: 'Current power',
+      name: 'currentExport',
+      description: 'Current exported energy',
       value: 0,
-      unit: 'w',
+      unit: 'W',
+      useHistory: true,
     },
     {
-      name: 'lastDayEnergy',
-      description: 'Last day energy',
+      name: 'currentConsumption',
+      description: 'Current energy consumption',
       value: 0,
-      unit: 'wh',
+      unit: 'W',
+      useHistory: true,
+    },
+    {
+      name: 'currentSelfConsumption',
+      description: 'Current self energy consumption',
+      value: 0,
+      unit: 'W',
+      useHistory: true,
+    },
+    {
+      name: 'currentImport',
+      description: 'Current imported energy',
+      value: 0,
+      unit: 'W',
+      useHistory: true,
     },
   ],
-  jobs: [
+  tasks: [
     {
-      interval: ['*/5', '*', '*', '*', '*'],
+      interval: ['*/15', '*', '*', '*', '*'],
       run: async (config: Config) => {
-        const res = await solarEdgeClient.getOverview(config.siteId);
+        const res = await solarEdgeClient.getPowerFlow(config.siteId);
+        let currentExport = 0;
+        let currentConsumption = 0;
+        let currentSelfConsumption = 0;
+        let currentImport = 0;
 
-        return [
-          ['currentPower', res.overview.currentPower.power],
-          ['lastDayEnergy', res.overview.lastDayData.energy],
-        ];
+        res.siteCurrentPowerFlow.connections.forEach((connection) => {
+          if (connection.from === 'GRID' && connection.to === 'Load') {
+            currentImport = res.siteCurrentPowerFlow.GRID.currentPower;
+          } else if (connection.from === 'PV' && connection.to === 'Load') {
+            currentSelfConsumption = res.siteCurrentPowerFlow.PV!.currentPower;
+
+            const energyExport = res.siteCurrentPowerFlow.PV!.currentPower - res.siteCurrentPowerFlow.LOAD.currentPower;
+            currentExport = energyExport > 0 ? energyExport : 0;
+          }
+        });
+        currentConsumption = res.siteCurrentPowerFlow.LOAD.currentPower;
+
+        return {
+          currentImport,
+          currentConsumption,
+          currentSelfConsumption,
+          currentExport,
+        };
       },
     },
   ],
-  run: async (config) => {
+  start: async (config) => {
     console.log('Config:', config);
     solarEdgeClient = new SolarEdgeClient(config.apiKey);
   },
