@@ -10,7 +10,7 @@
     "build": "tsc -p ."
   },
   "dependencies": {
-    "solaredge-client": "^0.3.2"
+    "solaredge-client": "^0.3.3"
   },
   "devDependencies": {
     "typescript": "^4.8.4"
