@@ -1,7 +1,9 @@
-# SignalNode Addons
-This repository includes all SignalNode addons.
+# SignalNode Integrations
 
-## Addons
-- SolarEdge *
+This repository includes all SignalNode integrations.
 
-**Work in progress*
+## Integrations
+
+- SolarEdge \*
+
+\*_Work in progress_
