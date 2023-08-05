@@ -37,48 +37,48 @@ const SolarEdgeIntegration: SignalNodeIntegration<Config, PropertyNames> = {
       },
     ],
   },
-  //   properties: [
-  //     {
-  //       name: 'currentImport',
-  //       description: 'Current imported energy',
-  //       value: 0,
-  //       unit: 'kW',
-  //       type: 'Plain',
-  //       useHistory: true,
-  //     },
-  //     {
-  //       name: 'currentExport',
-  //       description: 'Current exported energy',
-  //       value: 0,
-  //       unit: 'kW',
-  //       type: 'Plain',
-  //       useHistory: true,
-  //     },
-  //     {
-  //       name: 'currentConsumption',
-  //       description: 'Current energy consumption',
-  //       value: 0,
-  //       unit: 'kW',
-  //       type: 'Plain',
-  //       useHistory: true,
-  //     },
-  //     {
-  //       name: 'currentSelfConsumption',
-  //       description: 'Current energy consumption',
-  //       value: 0,
-  //       unit: 'kW',
-  //       type: 'Plain',
-  //       useHistory: true,
-  //     },
-  //     {
-  //       name: 'currentProduction',
-  //       description: 'Current self energy consumption',
-  //       value: 0,
-  //       unit: 'kW',
-  //       type: 'Plain',
-  //       useHistory: true,
-  //     },
-  //   ],
+  properties: [
+    {
+      name: 'currentImport',
+      description: 'Current imported energy',
+      value: 0,
+      unit: 'kW',
+      type: 'Plain',
+      useHistory: true,
+    },
+    {
+      name: 'currentExport',
+      description: 'Current exported energy',
+      value: 0,
+      unit: 'kW',
+      type: 'Plain',
+      useHistory: true,
+    },
+    {
+      name: 'currentConsumption',
+      description: 'Current energy consumption',
+      value: 0,
+      unit: 'kW',
+      type: 'Plain',
+      useHistory: true,
+    },
+    {
+      name: 'currentSelfConsumption',
+      description: 'Current energy consumption',
+      value: 0,
+      unit: 'kW',
+      type: 'Plain',
+      useHistory: true,
+    },
+    {
+      name: 'currentProduction',
+      description: 'Current self energy consumption',
+      value: 0,
+      unit: 'kW',
+      type: 'Plain',
+      useHistory: true,
+    },
+  ],
   //   tasks: [
   //     {
   //       interval: ['*/15', '*', '*', '*', '*'],
@@ -113,13 +113,10 @@ const SolarEdgeIntegration: SignalNodeIntegration<Config, PropertyNames> = {
   //     },
   //   ],
   start: async (eventBus, serviceManager, config) => {
-    console.log('Config:', config);
     solarEdgeClient = new SolarEdgeClient(config.apiKey);
 
     serviceManager.registerService(async () => {
       const results = await fetchPowerFlow(solarEdgeClient, config);
-      console.log(results);
-
       for (const key in results) {
         eventBus.emit(key, results[key as keyof typeof results]);
       }
