@@ -18,7 +18,7 @@ const SolarEdgeIntegration: SignalNodeIntegration<Config, PropertyNames> = {
     gap: 20,
     elements: [
       {
-        type: 'input',
+        type: 'password',
         name: 'apiKey',
         label: 'API Key',
         options: {
@@ -27,7 +27,7 @@ const SolarEdgeIntegration: SignalNodeIntegration<Config, PropertyNames> = {
         },
       },
       {
-        type: 'input',
+        type: 'password',
         name: 'siteId',
         label: 'Site ID',
         options: {
